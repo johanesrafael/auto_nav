@@ -10,6 +10,12 @@ import math
 import cmath
 import numpy as np
 import time
+import RPi.GPIO as GPIO
+
+pin2 = 26
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(pin2,GPIO.OUT)
+p=GPIO.PWM(pin2,50)
 
 laser_range = np.array([])
 occdata = []
@@ -166,7 +172,7 @@ def pick_direction():
             time.sleep(1/distance)
             pub.publish(twist)
             ##FIRE##
-    
+            e2_2()
    else:
 
         try:
@@ -232,5 +238,36 @@ def mover():
 if __name__ == '__main__':
     try:
         mover()
+    except rospy.ROSInterruptException:
+        pass
+def e2_2():
+        global laser_range
+        rospy.init_node('e2_2', anonymous=True)
+
+        # subscribe to LaserScan data
+        rospy.Subscriber('scan', LaserScan, get_laserscan)
+
+        rate = rospy.Rate(1)
+
+        rate.sleep()
+
+        p.start(2.5)
+
+        time.sleep(1)
+
+        print("Reached")
+        while True:
+			p.ChangeDutyCycle(2.5 + (float(45)/181)*10)
+			time.sleep(.5)
+
+			break
+
+        p.stop()
+        GPIO.cleanup()
+
+
+if __name__ == '__main__':
+    try:
+        e2_2()
     except rospy.ROSInterruptException:
         pass
