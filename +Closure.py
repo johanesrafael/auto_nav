@@ -110,8 +110,7 @@ def rotatebot(rot_angle):
 
 def pix_count():
     count = 0
-    global data
-    for row in data:
+    for row in global.data:
         for column in row:
             if column[0] > 10:
                 count += 1
@@ -133,74 +132,62 @@ def pick_direction():
 
     rotated_ = 0
     while pix_count() < 1000 and rotated_ != 360:
-        rotated_ += 5
-        t_yaw += 5
-        twist = Twist()
-        twist.linear.x = 0.0
-        twist.angular.z = 5
-        time.sleep(0.2)
-        pub.publish(twist)
-        if pix_count >= 1000:
-            angles = {}
-            rotation = 0
-            for i in range(30):
-                t_yaw += 1
-                twist = Twist()
-                twist.linear.x = 0.0
-                twist.angular.z = 5
-                time.sleep(0.2)
-                pub.publish(twist)
-                rotation += 1
-                angles[rotation] = pix_count()
-            max_val = max(angles.values)
-            best_dirn = 0
-            for a in angles:
-                if angles[a] == max_val:
-                    best_dirn = a
-            t_yaw -= (30-a)
-            twist = Twist()
-            twist.linear.x = 0.0
-            twist.angular.z = -(30-a)
-            time.sleep(0.2)
-            pub.publish(twist)        
-            if pix_count() < 100000:
-                rospy.loginfo(['Start moving'])
-                twist.linear.x = linear_speed
-                twist.angular.z = 0.0
-                time.sleep(1)
-                pub.publish(twist)
-                rospy.loginfo(['Fire 1'])
-                break
-            else:
-                rospy.loginfo(['Start moving'])
-                twist.linear.x = -linear_speed
-                twist.angular.z = 0.0
-                time.sleep(1)
-                pub.publish(twist)
-                rospy.loginfo(['Fire 2'])
-                break
+        rotated_ += 10
+        t_yaw += 10
+        rotatebot(10)
+    if pix_count >= 1000:
+        angles = {}
+        rotation = 0
+        for i in range(10):
+            rotatebot(3)
+            rotation += 3
+            angles[rotation] = pix_count()
+        max_val = max(angles.values)
+        best_dirn = 0
+        for a in angles:
+            if angles[a] == max_val:
+                best_dirn = a
+        t_yaw -= (30-a)
+        rotatebot(-(30-a))    
         
-        else:
-    
-            try:
-                lr2i = np.argmax(laser_range)
-            except ValueError:
-            # in case laser_range is empty
-                lr2i = 0
-            rospy.loginfo(['Target not found'])
-            rospy.loginfo(['Picked direction: ' + str(lr2i)])
-    
-        # rotate to that direction
-            rotatebot(float(lr2i))
-    
-        # start moving
+        if pix_count() < 100000:
             rospy.loginfo(['Start moving'])
             twist.linear.x = linear_speed
             twist.angular.z = 0.0
-        # not sure if this is really necessary, but things seem to work more
-        # reliably with this
-            time.sleep(1)
+            distance = laser_range[0,0]
+            time.sleep(distance)
             pub.publish(twist)
+            ##FIRE##
+        else:
+            rospy.loginfo(['Start moving'])
+            twist.linear.x = -linear_speed
+            twist.angular.z = 0.0
+            distance = laser_range[0,0]
+            time.sleep(1/distance)
+            pub.publish(twist)
+            ##FIRE##
+    
+   else:
+
+        try:
+            lr2i = np.argmax(laser_range)
+        except ValueError:
+        # in case laser_range is empty
+            lr2i = 0
+        rospy.loginfo(['Target not found'])
+        rospy.loginfo(['Picked direction: ' + str(lr2i)])
+
+    # rotate to that direction
+        rotatebot(float(lr2i))
+
+    # start moving
+        rospy.loginfo(['Start moving'])
+        twist.linear.x = linear_speed
+        twist.angular.z = 0.0
+    # not sure if this is really necessary, but things seem to work more
+    # reliably with this
+        time.sleep(1)
+        pub.publish(twist)
 
 
 def mover():
