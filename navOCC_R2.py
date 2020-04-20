@@ -1,13 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 14 00:39:07 2020
-
-@author: ozair
-"""
-
-
-
+# FINAL CODE FOR NAVIGATION AND MAPPING
 import rospy
 from nav_msgs.msg import Odometry
 from nav_msgs.msg import OccupancyGrid
