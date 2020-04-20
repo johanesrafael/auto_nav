@@ -1,10 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Mar 11 01:24:43 2020
-
-@author: ozair
-"""
+# FINAL CODE FOR NAVIGATION AND MAPPING
 
 import rospy
 from nav_msgs.msg import Odometry
